@@ -1,8 +1,9 @@
-package com.azat.runningtracker
+package com.azat.runningtracker.ui
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.azat.runningtracker.R
 import com.azat.runningtracker.db.RunDAO
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
