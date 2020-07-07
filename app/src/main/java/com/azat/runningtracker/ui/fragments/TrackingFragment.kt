@@ -1,9 +1,12 @@
 package com.azat.runningtracker.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.azat.runningtracker.R
+import com.azat.runningtracker.other.Constants
+import com.azat.runningtracker.services.TrackingService
 import com.azat.runningtracker.ui.viewmodel.MainViewModel
 import com.google.android.gms.maps.GoogleMap
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,10 +30,19 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
         super.onActivityCreated(savedInstanceState)
         mapView.onCreate(savedInstanceState)
 
+        btnToggleRun.setOnClickListener {
+            sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+        }
         mapView.getMapAsync {
             map = it
         }
     }
+
+    private fun sendCommandToService(action: String) =
+        Intent(requireContext(), TrackingService::class.java).also {
+            it.action = action
+            requireContext().startService(it)
+        }
 
     override fun onResume() {
         super.onResume()
