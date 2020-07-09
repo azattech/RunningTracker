@@ -1,10 +1,25 @@
 package com.azat.runningtracker.services
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_LOW
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import com.azat.runningtracker.R
 import com.azat.runningtracker.other.Constants.ACTION_PAUSE_SERVICE
+import com.azat.runningtracker.other.Constants.ACTION_SHOW_TRACKING_FRAGMENT
 import com.azat.runningtracker.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.azat.runningtracker.other.Constants.ACTION_STOP_SERVICE
+import com.azat.runningtracker.other.Constants.NOTIFICATION_CHANNEL_ID
+import com.azat.runningtracker.other.Constants.NOTIFICATION_CHANNEL_NAME
+import com.azat.runningtracker.other.Constants.NOTIFICATION_ID
+import com.azat.runningtracker.ui.MainActivity
 import timber.log.Timber
 
 /*************************
@@ -29,7 +44,7 @@ import timber.log.Timber
 *
 * Also we need to worry about the communication from our service to our
 * TrackingFragment because we need to to coordinate of the user data.
-* Soı that we basically have two major options to do that.
+* So that we basically have two major options to do that.
 * One option is Singleton pattern.
 * The other option would be to make this service a bound service so that
 * basically means that the service acts as kind of server and clients can
@@ -38,12 +53,18 @@ import timber.log.Timber
 * */
 class TrackingService : LifecycleService() {
 
+    var isFirstRun = true
     // whenever we send a command to our service so whenever we send an Intent with an action attached to this service class
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
-                    Timber.d("Started or resume service")
+                    if (isFirstRun) {
+                        startForegroundService()
+                        isFirstRun = false
+                    } else {
+                        Timber.d("Resuming service..")
+                    }
                 }
                 ACTION_PAUSE_SERVICE -> {
                     Timber.d("Paused service")
@@ -54,5 +75,58 @@ class TrackingService : LifecycleService() {
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    /* NotificationManager is just system service so a service of the Android framework
+    * that we need whenever we want to show notification so we just get a reference
+    * to that system service and then we create our notification locally here in our app
+    * and then we basically pass that notification to notification manager so Android
+    * system can actually show our notification */
+    private fun startForegroundService() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
+                as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager)
+        }
+
+        // setAutoCancel(false) will just prevent that if the user clicks on our notification
+        // that the notification disappears we always want to the notification to be active and that's why we have to set
+        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.ic_directions_run_black_24dp)
+            .setContentTitle("Running App")
+            .setContentText("00:00:00")
+            .setContentIntent(getMainActivityPendingIntent())
+
+
+        startForeground(NOTIFICATION_ID, notificationBuilder.build())
+    }
+
+    /* Also we need to pass to that notificationBuilder is a PendingIntent. A PendingIntent is used
+    * here to open our MainActivity when we click on our notification */
+    private fun getMainActivityPendingIntent() = PendingIntent.getActivity(
+        this,
+        0,
+        Intent(this, MainActivity::class.java).also {
+            it.action = ACTION_SHOW_TRACKING_FRAGMENT
+        },
+        FLAG_UPDATE_CURRENT // whenever we launch that PendingIntent and it already exists it will update it instead of recreating or restarting it
+    )
+
+
+    /* We need to create a notification with which we will launch this foreground service
+    * so whenever you want to show another notification then we need to make sure to
+    * create a channel for that a notification channel or at least for Android Oreo and later
+    */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(channel)
     }
 }
