@@ -73,7 +73,6 @@ class TrackingService : LifecycleService() {
 
     companion object {
         val isTracking = MutableLiveData<Boolean>()
-
         // val pathPoints = MutableLiveData<MutableList<MutableList<LatLng>>>()
         val pathPoints = MutableLiveData<PolyLines>()
     }
@@ -103,10 +102,12 @@ class TrackingService : LifecycleService() {
                         isFirstRun = false
                     } else {
                         Timber.d("Resuming service..")
+                        startForegroundService()
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
                     Timber.d("Paused service")
+                    pauseService()
                 }
                 ACTION_STOP_SERVICE -> {
                     Timber.d("Stopped service")
@@ -114,6 +115,10 @@ class TrackingService : LifecycleService() {
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun pauseService() {
+        isTracking.postValue(false)
     }
 
     @SuppressLint("MissingPermission")
