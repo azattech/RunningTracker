@@ -12,6 +12,7 @@ import com.azat.runningtracker.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.azat.runningtracker.other.Constants.MAP_ZOOM
 import com.azat.runningtracker.other.Constants.POLYLINE_COLOR
 import com.azat.runningtracker.other.Constants.POLYLINE_WIDTH
+import com.azat.runningtracker.other.TrackingUtility
 import com.azat.runningtracker.services.Polyline
 import com.azat.runningtracker.services.TrackingService
 import com.azat.runningtracker.ui.viewmodel.MainViewModel
@@ -35,7 +36,10 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     private var isTracking = false
     private var pathPoints = mutableListOf<Polyline>()
+
     private var map: GoogleMap? = null
+
+    private var curTimeMillis = 0L
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -61,6 +65,12 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             pathPoints = it
             addLatestPolyline()
             moveCameraToUser()
+        })
+
+        TrackingService.timeRunInMillis.observe(viewLifecycleOwner, Observer {
+            curTimeMillis = it
+            val formattedTime = TrackingUtility.getFormattedStopWatchTime(curTimeMillis, true)
+            tvTimer.text = formattedTime
         })
     }
 
