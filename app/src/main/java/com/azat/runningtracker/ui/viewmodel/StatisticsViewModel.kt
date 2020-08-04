@@ -9,8 +9,16 @@ import com.azat.runningtracker.repository.MainRepository
  *                       *
  * Contact: @theazat     *
  *                       *
- * 22/06/2020 - 10:24 PM  *
+ * 22/06/2020 - 10:24 PM *
  ************************/
 class StatisticsViewModel @ViewModelInject constructor(
     val mainRepository: MainRepository
-) : ViewModel()
+) : ViewModel() {
+
+    val totalTimeRun = mainRepository.getTotalTimeInMillis()
+    val totalDistance = mainRepository.getTotalDistance()
+    val totalCaloriesBurned = mainRepository.getTotalCaloriesBurned()
+    val totalAvgSpeed = mainRepository.getTotalAvgSpeed()
+
+    val runSortedByDate = mainRepository.getAllRunsSortedByDate()
+}
