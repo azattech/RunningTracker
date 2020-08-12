@@ -12,13 +12,13 @@ import com.azat.runningtracker.repository.MainRepository
  * 22/06/2020 - 10:24 PM *
  ************************/
 class StatisticsViewModel @ViewModelInject constructor(
-    val mainRepository: MainRepository
+    mainRepository: MainRepository
 ) : ViewModel() {
 
-    val totalTimeRun = mainRepository.getTotalTimeInMillis()
-    val totalDistance = mainRepository.getTotalDistance()
-    val totalCaloriesBurned = mainRepository.getTotalCaloriesBurned()
-    val totalAvgSpeed = mainRepository.getTotalAvgSpeed()
+    var totalDistance = mainRepository.getTotalDistance()
+    var totalTimeInMillis = mainRepository.getTotalTimeInMillis()
+    var totalAvgSpeed = mainRepository.getTotalAvgSpeed()
+    var totalCaloriesBurned = mainRepository.getTotalCaloriesBurned()
 
-    val runSortedByDate = mainRepository.getAllRunsSortedByDate()
+    var runsSortedByDate = mainRepository.getAllRunsSortedByDate()
 }

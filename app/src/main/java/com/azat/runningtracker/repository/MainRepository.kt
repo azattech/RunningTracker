@@ -1,7 +1,7 @@
 package com.azat.runningtracker.repository
 
 import com.azat.runningtracker.db.Run
-import com.azat.runningtracker.db.RunDAO
+import com.azat.runningtracker.db.RunDao
 import javax.inject.Inject
 
 /*************************
@@ -12,7 +12,7 @@ import javax.inject.Inject
  * 22/06/2020 - 10:11 PM *
  ************************/
 class MainRepository @Inject constructor(
-    val runDao: RunDAO
+    val runDao: RunDao
 ) {
     suspend fun insertRun(run: Run) = runDao.insertRun(run)
 
@@ -21,19 +21,19 @@ class MainRepository @Inject constructor(
     //ders 7 dakika 4.20 tekrar et
     fun getAllRunsSortedByDate() = runDao.getAllRunsSortedByDate()
 
-    fun getAllRunsSortedByDistance() = runDao.getAllRunsSortedByDistance()
-
     fun getAllRunsSortedByTimeInMillis() = runDao.getAllRunsSortedByTimeInMillis()
 
-    fun getAllRunsSortedByAvgSpeed() = runDao.getAllRunsSortedByAvgSpeed()
+    fun getAllRunsSortedByDistance() = runDao.getAllRunsSortedByDistance()
 
     fun getAllRunsSortedByCaloriesBurned() = runDao.getAllRunsSortedByCaloriesBurned()
 
-    fun getTotalAvgSpeed() = runDao.getTotalAvgSpeed()
+    fun getAllRunsSortedByAvgSpeed() = runDao.getAllRunsSortedByAvgSpeed()
 
     fun getTotalDistance() = runDao.getTotalDistance()
 
-    fun getTotalCaloriesBurned() = runDao.getTotalCaloriesBurned()
-
     fun getTotalTimeInMillis() = runDao.getTotalTimeInMillis()
+
+    fun getTotalAvgSpeed() = runDao.getTotalAvgSpeed()
+
+    fun getTotalCaloriesBurned() = runDao.getTotalCaloriesBurned()
 }

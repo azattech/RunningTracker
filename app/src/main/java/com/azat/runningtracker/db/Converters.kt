@@ -12,6 +12,9 @@ import java.io.ByteArrayOutputStream
  *                       *
  * 16/06/2020 - 8:14 PM  *
  ************************/
+/**
+ * Converter class to save bitmaps in the Room Database
+ */
 class Converters {
 
     @TypeConverter
@@ -25,4 +28,5 @@ class Converters {
         bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         return outputStream.toByteArray()
     }
+
 }

@@ -23,56 +23,59 @@ import java.util.*
  ************************/
 class RunAdapter : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
 
-    inner class RunViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-
     private val diffCallback = object : DiffUtil.ItemCallback<Run>() {
+        override fun areItemsTheSame(oldItem: Run, newItem: Run): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-        override fun areItemsTheSame(oldItem: Run, newItem: Run) = oldItem.id == newItem.id
-
-        /*  we can compare two items and if those hash values are the same with
-            all the properties that those items have the bitmap must be the same that
-            those two items have the same hashcode */
-        override fun areContentsTheSame(oldItem: Run, newItem: Run) =
-            oldItem.hashCode() == newItem.hashCode()
+        override fun areContentsTheSame(oldItem: Run, newItem: Run): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
     }
 
-    private val differ = AsyncListDiffer(this, diffCallback)
+    // ListDiffer to efficiently deal with changes in the RecyclerView
+    val differ = AsyncListDiffer(this, diffCallback)
+
+    inner class RunViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     fun submitList(list: List<Run>) = differ.submitList(list)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        RunViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RunViewHolder {
+        return RunViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_run,
                 parent,
                 false
             )
         )
+    }
 
-    override fun getItemCount() = differ.currentList.size
+    override fun getItemCount(): Int {
+        return differ.currentList.size
+    }
 
     override fun onBindViewHolder(holder: RunViewHolder, position: Int) {
         val run = differ.currentList[position]
+        // set item data
         holder.itemView.apply {
             Glide.with(this).load(run.img).into(ivRunImage)
 
             val calendar = Calendar.getInstance().apply {
-                timeInMillis = run.timesTamp
+                timeInMillis = run.timestamp
             }
-
             val dateFormat = SimpleDateFormat("dd.MM.yy", Locale.getDefault())
             tvDate.text = dateFormat.format(calendar.time)
 
-            val avgSpeed = "${run.avgSpeedInKMH}km/h"
-            tvAvgSpeed.text = avgSpeed
-
-            val distanceInKm = "${run.distanceInMeters / 1000f}km"
-            tvDistance.text = distanceInKm
-
+            "${run.avgSpeedInKMH}km/h".also {
+                tvAvgSpeed.text = it
+            }
+            "${run.distanceInMeters / 1000f}km".also {
+                tvDistance.text = it
+            }
             tvTime.text = TrackingUtility.getFormattedStopWatchTime(run.timeInMillis)
-
-            val caloriesBurned = "${run.caloriesBurned}kcal"
-            tvCalories.text = caloriesBurned
+            "${run.caloriesBurned}kcal".also {
+                tvCalories.text = it
+            }
         }
     }
 }

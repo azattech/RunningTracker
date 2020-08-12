@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.azat.runningtracker.R
-import com.azat.runningtracker.other.CustomMarkerView
 import com.azat.runningtracker.other.TrackingUtility
+import com.azat.runningtracker.ui.CustomMarkerView
 import com.azat.runningtracker.ui.viewmodel.StatisticsViewModel
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -33,11 +33,11 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        subscribeToObserve()
-        setupBarChart()
+        setupLineChart()
+        subscribeToObservers()
     }
 
-    private fun setupBarChart() {
+    private fun setupLineChart() {
         barChart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             setDrawLabels(false)
@@ -61,45 +61,57 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
         }
     }
 
-    private fun subscribeToObserve() {
-        viewModel.totalTimeRun.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val totalTimeRun = TrackingUtility.getFormattedStopWatchTime(it)
-                tvTotalTime.text = totalTimeRun
-            }
-        })
+    private fun subscribeToObservers() {
         viewModel.totalDistance.observe(viewLifecycleOwner, Observer {
+            // in case DB is empty it will be null
             it?.let {
                 val km = it / 1000f
-                val totalDistance = round(km * 10f) / 10f
+                val totalDistance = round(km * 10) / 10f
                 val totalDistanceString = "${totalDistance}km"
                 tvTotalDistance.text = totalDistanceString
             }
         })
+
+        viewModel.totalTimeInMillis.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                val totalTimeInMillis = TrackingUtility.getFormattedStopWatchTime(it)
+                tvTotalTime.text = totalTimeInMillis
+            }
+        })
+
         viewModel.totalAvgSpeed.observe(viewLifecycleOwner, Observer {
             it?.let {
-                val avgSpeed = round(it * 10f) / 10f
-                val avgSpeedString = "${avgSpeed}km/h"
-                tvAverageSpeed.text = avgSpeedString
+                val roundedAvgSpeed = round(it * 10f) / 10f
+                val totalAvgSpeed = "${roundedAvgSpeed}km/h"
+                tvAverageSpeed.text = totalAvgSpeed
             }
         })
+
         viewModel.totalCaloriesBurned.observe(viewLifecycleOwner, Observer {
             it?.let {
-                val totalCalories = "${it}kcal"
-                tvTotalCalories.text = totalCalories
+                val totalCaloriesBurned = "${it}kcal"
+                tvTotalCalories.text = totalCaloriesBurned
             }
         })
-        viewModel.runSortedByDate.observe(viewLifecycleOwner, Observer {
+
+        viewModel.runsSortedByDate.observe(viewLifecycleOwner, Observer {
             it?.let {
                 val allAvgSpeeds =
                     it.indices.map { i -> BarEntry(i.toFloat(), it[i].avgSpeedInKMH) }
-                val barDataSet = BarDataSet(allAvgSpeeds, "Avg Speed Over Time").apply {
+
+                val bardataSet = BarDataSet(allAvgSpeeds, "Avg Speed over Time")
+                bardataSet.apply {
                     valueTextColor = Color.WHITE
                     color = ContextCompat.getColor(requireContext(), R.color.colorAccent)
                 }
-                barChart.data = BarData(barDataSet)
-                barChart.marker =
-                    CustomMarkerView(it.reversed(), requireContext(), R.layout.marker_view)
+                val lineData = BarData(bardataSet)
+                barChart.data = lineData
+                val marker = CustomMarkerView(
+                    it.reversed(),
+                    requireContext(),
+                    R.layout.marker_view
+                )
+                barChart.marker = marker
                 barChart.invalidate()
             }
         })

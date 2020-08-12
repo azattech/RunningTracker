@@ -7,6 +7,9 @@ package com.azat.runningtracker.other
  *                       *
  * 20/07/2020 - 8:26 AM  *
  ************************/
+/**
+ * Describes the sort type of the run list
+ */
 enum class SortType {
-    DATE, RUNNING_TIME, AVG_SPEED, DISTANCE, CALORIES_BURNED
+    DATE, RUNNING_TIME, DISTANCE, AVG_SPEED, CALORIES_BURNED
 }
