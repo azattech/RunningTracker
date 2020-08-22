@@ -287,6 +287,7 @@ class TrackingService : LifecycleService() {
     /**
      * Updates the action buttons of the notification
      */
+    @SuppressLint("RestrictedApi")
     private fun updateNotificationTrackingState(isTracking: Boolean) {
         val notificationActionText = if (isTracking) "Pause" else "Resume"
         val pendingIntent = if (isTracking) {
@@ -303,15 +304,39 @@ class TrackingService : LifecycleService() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        curNotification.javaClass.getDeclaredField("mActions").apply {
-            isAccessible = true
-            set(curNotification, ArrayList<NotificationCompat.Action>())
-        }
+        curNotification.mActions.clear()
 
         if (!serviceKilled) {
             curNotification = baseNotificationBuilder
                 .addAction(R.drawable.ic_pause_black_24dp, notificationActionText, pendingIntent)
             notificationManager.notify(NOTIFICATION_ID, curNotification.build())
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun updateNotificationTrackingState2(isTracking: Boolean) {
+        val notificationActionText = if (isTracking) "Pause" else "Resume"
+        val pendingIntent = PendingIntent.getService(
+            this,
+            if (isTracking) 1 else 2,
+            Intent(this, TrackingService::class.java).apply {
+                action = if (isTracking) ACTION_PAUSE_SERVICE else ACTION_START_OR_RESUME_SERVICE
+            },
+            FLAG_UPDATE_CURRENT
+        )
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        curNotification.mActions.clear()
+        if (!serviceKilled) {
+
+            curNotification = baseNotificationBuilder
+
+                .addAction(R.drawable.ic_pause_black_24dp, notificationActionText, pendingIntent)
+
+            notificationManager.notify(NOTIFICATION_ID, curNotification.build())
+
         }
     }
 
