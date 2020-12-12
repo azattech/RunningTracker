@@ -117,23 +117,34 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
         if (TrackingUtility.hasLocationPermissions(requireContext())) {
             return
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            EasyPermissions.requestPermissions(
-                this,
-                "You need to accept location permission to use this app",
-                REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        } else {
-            EasyPermissions.requestPermissions(
-                this,
-                "You need to accept location permission all time to use this app",
-                REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> {
+                EasyPermissions.requestPermissions(
+                    this,
+                    "You need to accept location permission to track your distance and route.",
+                    REQUEST_CODE_LOCATION_PERMISSION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            }
+            Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+                EasyPermissions.requestPermissions(
+                    this,
+                    "To track your distance and route, the app also needs to access your location while app is in the background. Please enable 'Allow all the time' location permission. You can change this permission in the device settings.",
+                    REQUEST_CODE_LOCATION_PERMISSION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            }
+            else -> {
+                EasyPermissions.requestPermissions(
+                    this,
+                    "This app doesn't use your any data. To track your distance and route, the app also needs to access your location while app is in the background. Please enable 'Allow all the time' location permission. You can change this permission in the device settings.",
+                    REQUEST_CODE_LOCATION_PERMISSION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            }
         }
     }
 

@@ -15,7 +15,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-
 import androidx.lifecycle.observe
 import com.azat.runningtracker.R
 import com.azat.runningtracker.other.Constants
