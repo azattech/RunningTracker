@@ -14,9 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.azat.runningtracker.R
 import com.azat.runningtracker.adapters.RunAdapter
+import com.azat.runningtracker.other.*
 import com.azat.runningtracker.other.Constants.Companion.REQUEST_CODE_LOCATION_PERMISSION
-import com.azat.runningtracker.other.SortType
-import com.azat.runningtracker.other.TrackingUtility
 import com.azat.runningtracker.ui.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,9 +43,9 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
         runAdapter = RunAdapter()
 
         setupRecyclerView()
-        requestPermissions()
+        // requestPermissions()
         fab.setOnClickListener {
-            findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
+            askPermissions()
         }
 
         when (viewModel.sortType) {
@@ -113,6 +112,27 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(this)
     }
 
+    private fun askPermissions() {
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> {
+                if (checkLocationPermissionAPI28(REQUEST_CODE_LOCATION_PERMISSION)) {
+                    findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
+                }
+            }
+            Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+                if (checkLocationPermissionAPI29(REQUEST_CODE_LOCATION_PERMISSION)) {
+                    findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
+                }
+            }
+            else -> {
+                if (checkBackgroundLocationPermissionAPI30(REQUEST_CODE_LOCATION_PERMISSION)) {
+                    findNavController().navigate(R.id.action_runFragment_to_trackingFragment)
+                }
+            }
+
+        }
+    }
+
     private fun requestPermissions() {
         if (TrackingUtility.hasLocationPermissions(requireContext())) {
             return
@@ -152,7 +172,7 @@ class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionC
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             AppSettingsDialog.Builder(this).setThemeResId(R.style.AlertDialogTheme).build().show()
         } else {
-            requestPermissions()
+            // requestPermissions()
         }
     }
 

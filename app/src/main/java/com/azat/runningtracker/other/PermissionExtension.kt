@@ -2,13 +2,15 @@ package com.azat.runningtracker.other
 
 import android.Manifest
 import android.annotation.TargetApi
-import android.app.Activity
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.azat.runningtracker.BuildConfig
 
 /*************************
  * Created by AZAT SAYAN *
@@ -18,22 +20,28 @@ import androidx.core.content.ContextCompat
  * 12/12/2020 - 2:19 PM  *
  ************************/
 
-private fun Context.checkSinglePermission(permission: String) =
-    ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+private fun Fragment.checkSinglePermission(permission: String) =
+    ContextCompat.checkSelfPermission(
+        requireContext(),
+        permission
+    ) == PackageManager.PERMISSION_GRANTED
 
 /**
  * Build.VERSION_CODES.P
  * */
 @TargetApi(28)
-fun Context.checkLocationPermissionAPI28(locationRequestCode: Int) {
-    if (!checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) ||
+fun Fragment.checkLocationPermissionAPI28(locationRequestCode: Int): Boolean {
+    return if (!checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) ||
         !checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION)
     ) {
         val permList = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
-        requestPermissions(this as Activity, permList, locationRequestCode)
+        requestPermissions(permList, locationRequestCode)
+        false
+    } else {
+        true
     }
 }
 
@@ -41,44 +49,112 @@ fun Context.checkLocationPermissionAPI28(locationRequestCode: Int) {
  * Build.VERSION_CODES.Q
  * */
 @TargetApi(29)
-fun Context.checkLocationPermissionAPI29(locationRequestCode: Int) {
-    if (checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-        checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
-        checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    ) return
-    val permList = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    )
-    requestPermissions(this as Activity, permList, locationRequestCode)
+fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
+    if (!checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+        !checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+        !checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    ) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Need your location ")
+            .setMessage(
+                "To track your distance and route, we also need to access your location while the app is in the background" +
+                        " You can change this permission in the device settings."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Allow") { _, _ ->
+                val permList = arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+                requestPermissions(permList, locationRequestCode)
+            }
+            .setNegativeButton("Deny") { dialog, _ ->
+                dialog.dismiss()
+                okDialog()
+            }
+            .create()
+            .show()
+        return false
+    } else {
+        if (!checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Need your location ")
+                .setMessage(
+                    "To track your distance and route, we also need to access your location while the app is in the background" +
+                            " You can change this permission in the device settings."
+                )
+                .setCancelable(false)
+                .setPositiveButton("Allow") { _, _ ->
+                    val permList = arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    )
+                    requestPermissions(permList, locationRequestCode)
+                }
+                .setNegativeButton("Deny") { dialog, _ ->
+                    dialog.dismiss()
+                    okDialog()
+                }
+                .create()
+                .show()
+            return false
+        }
+        return true
+    }
 }
 
 /**
  * Build.VERSION_CODES.R
  * */
 @TargetApi(30)
-fun Context.checkBackgroundLocationPermissionAPI30(backgroundLocationRequestCode: Int) {
-    if (checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) return
-    AlertDialog.Builder(this)
-        .setTitle("Title")
-        .setMessage("You need to accept location permission to use this app")
-        .setPositiveButton("Yes") { _, _ ->
-            // this request will take user to Application's Setting page
-            requestPermissions(
-                this as Activity,
-                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                backgroundLocationRequestCode
-            )
-        }
-        .setNegativeButton("No") { dialog, _ ->
+fun Fragment.checkBackgroundLocationPermissionAPI30(backgroundLocationRequestCode: Int): Boolean {
+    if (!checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Need your location ")
+            .setMessage("If you want to use the app you must give ")
+            .setCancelable(false)
+            .setPositiveButton("Yes") { _, _ ->
+                // this request will take user to Application's Setting page
+                val i = Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                )
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(i)
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    backgroundLocationRequestCode
+                )
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+        return false
+    } else {
+        return true
+    }
+}
+
+fun Fragment.okDialog() {
+    AlertDialog.Builder(requireContext())
+        .setTitle("Location Denied")
+        .setMessage(
+            "In order for the app to track your distance and route, the app needs additional access to your location. " +
+                    "You can change this permission in the device settings."
+        )
+        .setCancelable(false)
+        .setPositiveButton("Ok") { dialog, _ ->
             dialog.dismiss()
         }
         .create()
         .show()
 }
 
-fun Context.checkBackgroundLocationPermission(locationRequestCode: Int) {
+fun Fragment.checkBackgroundLocationPermission(locationRequestCode: Int) {
     when {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> {
             checkLocationPermissionAPI28(locationRequestCode)
