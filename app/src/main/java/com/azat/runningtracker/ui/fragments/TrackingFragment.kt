@@ -240,6 +240,12 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
         val height = mapView.height
         map?.moveCamera(
             CameraUpdateFactory.newLatLngBounds(
+                /*
+                 java.lang.IllegalStateException: no included points
+        at com.google.android.gms.common.internal.Preconditions.checkState(Unknown Source:29)
+        at com.google.android.gms.maps.model.LatLngBounds$Builder.build(Unknown Source:21)
+
+                https://stackoverflow.com/questions/47102127/error-java-lang-illegalstateexception-no-included-points*/
                 bounds.build(),
                 width,
                 height,

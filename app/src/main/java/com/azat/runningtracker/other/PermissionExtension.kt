@@ -10,7 +10,6 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.azat.runningtracker.BuildConfig
 
 /*************************
  * Created by AZAT SAYAN *
@@ -113,16 +112,18 @@ fun Fragment.checkBackgroundLocationPermissionAPI30(backgroundLocationRequestCod
     if (!checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
         AlertDialog.Builder(requireContext())
             .setTitle("Need your location ")
-            .setMessage("If you want to use the app you must give ")
+            .setMessage(
+                "To track your distance and route, we also need to access your location while the app is in the background" +
+                        " You can change this permission in the device settings."
+            )
             .setCancelable(false)
             .setPositiveButton("Yes") { _, _ ->
                 // this request will take user to Application's Setting page
-                val i = Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-                )
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(i)
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                //  val uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+                intent.data = uri
+                startActivity(intent)
                 requestPermissions(
                     arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
                     backgroundLocationRequestCode
