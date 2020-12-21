@@ -10,4 +10,11 @@
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBFqQKyxkfLYFmv5z6cG67kbQ45DKS5ZIY</string>
     <string name="start_text">resume</string>
     <string name="stop_text">stop</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="location_permission_title">Need your location</string>
+    <string name="location_permission_description">To track your distance and route, we also need to access your location while the app is in the background. You can change this permission in the device settings.</string>
+    <string name="location_permission_positive_button">Allow</string>
+    <string name="location_permission_negative_button">Deny</string>
+    <string name="permission_denied_title">Location Denied</string>
+    <string name="permission_denied_description">In order for the app to track your distance and route, the app needs additional access to your location. You can change this permission in the device settings.</string>
 </resources>

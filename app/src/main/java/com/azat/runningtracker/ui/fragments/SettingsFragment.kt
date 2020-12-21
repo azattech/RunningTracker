@@ -1,12 +1,15 @@
 package com.azat.runningtracker.ui.fragments
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.azat.runningtracker.R
 import com.azat.runningtracker.other.Constants.Companion.KEY_NAME
 import com.azat.runningtracker.other.Constants.Companion.KEY_WEIGHT
+import com.azat.runningtracker.other.Constants.Companion.POLICY_LINK
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
@@ -41,6 +44,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     Snackbar.LENGTH_SHORT
                 ).show()
             }
+        }
+
+        privacy_policy.setOnClickListener {
+            /*  val action = NavGraphDirections.actionGlobalPrivacyPolicyFragment()
+              findNavController().navigate(action) */
+
+            val i = Intent(Intent.ACTION_VIEW)
+                .setData(Uri.parse(POLICY_LINK))
+            startActivity(i)
         }
     }
 

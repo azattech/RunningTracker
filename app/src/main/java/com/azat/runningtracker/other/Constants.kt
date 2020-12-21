@@ -54,5 +54,10 @@ class Constants {
         const val ACTION_START_OR_RESUME_SERVICE = "ACTION_START_SERVICE"
         const val ACTION_PAUSE_SERVICE = "ACTION_PAUSE_SERVICE"
         const val ACTION_STOP_SERVICE = "ACTION_STOP_SERVICE"
+
+        // Privacy Policy Link
+        const val POLICY_LINK =
+            "https://www.notion.so/theazat/Privacy-Policy-of-Running-Tracker-da067a1a02a54e79b81e3f1124e15e5d/"
+
     }
 }

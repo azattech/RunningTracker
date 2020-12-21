@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/setupFragment">
 
@@ -41,4 +42,12 @@
         android:id="@+id/settingsFragment"
         android:name="com.azat.runningtracker.ui.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/privacyPolicyFragment"
+        android:name="com.azat.runningtracker.ui.fragments.PrivacyPolicyFragment"
+        android:label="fragment_privacy_policy"
+        tools:layout="@layout/fragment_privacy_policy" />
+    <action
+        android:id="@+id/action_global_privacyPolicyFragment"
+        app:destination="@id/privacyPolicyFragment" />
 </navigation>

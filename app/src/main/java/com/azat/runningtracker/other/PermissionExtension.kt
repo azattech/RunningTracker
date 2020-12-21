@@ -10,6 +10,7 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.azat.runningtracker.R
 
 /*************************
  * Created by AZAT SAYAN *
@@ -54,13 +55,10 @@ fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
         !checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     ) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Need your location ")
-            .setMessage(
-                "To track your distance and route, we also need to access your location while the app is in the background" +
-                        " You can change this permission in the device settings."
-            )
+            .setTitle(getString(R.string.location_permission_title))
+            .setMessage(getString(R.string.location_permission_description))
             .setCancelable(false)
-            .setPositiveButton("Allow") { _, _ ->
+            .setPositiveButton(getString(R.string.location_permission_positive_button)) { _, _ ->
                 val permList = arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -68,7 +66,7 @@ fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
                 )
                 requestPermissions(permList, locationRequestCode)
             }
-            .setNegativeButton("Deny") { dialog, _ ->
+            .setNegativeButton(getString(R.string.location_permission_negative_button)) { dialog, _ ->
                 dialog.dismiss()
                 okDialog()
             }
@@ -78,13 +76,10 @@ fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
     } else {
         if (!checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
             AlertDialog.Builder(requireContext())
-                .setTitle("Need your location ")
-                .setMessage(
-                    "To track your distance and route, we also need to access your location while the app is in the background" +
-                            " You can change this permission in the device settings."
-                )
+                .setTitle(getString(R.string.location_permission_title))
+                .setMessage(getString(R.string.location_permission_description))
                 .setCancelable(false)
-                .setPositiveButton("Allow") { _, _ ->
+                .setPositiveButton(getString(R.string.location_permission_positive_button)) { _, _ ->
                     val permList = arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -92,7 +87,7 @@ fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
                     )
                     requestPermissions(permList, locationRequestCode)
                 }
-                .setNegativeButton("Deny") { dialog, _ ->
+                .setNegativeButton(getString(R.string.location_permission_negative_button)) { dialog, _ ->
                     dialog.dismiss()
                     okDialog()
                 }
@@ -111,11 +106,8 @@ fun Fragment.checkLocationPermissionAPI29(locationRequestCode: Int): Boolean {
 fun Fragment.checkBackgroundLocationPermissionAPI30(backgroundLocationRequestCode: Int): Boolean {
     if (!checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Need your location ")
-            .setMessage(
-                "To track your distance and route, we also need to access your location while the app is in the background" +
-                        " You can change this permission in the device settings."
-            )
+            .setTitle(getString(R.string.location_permission_title))
+            .setMessage(getString(R.string.location_permission_description))
             .setCancelable(false)
             .setPositiveButton("Yes") { _, _ ->
                 // this request will take user to Application's Setting page
@@ -142,10 +134,9 @@ fun Fragment.checkBackgroundLocationPermissionAPI30(backgroundLocationRequestCod
 
 fun Fragment.okDialog() {
     AlertDialog.Builder(requireContext())
-        .setTitle("Location Denied")
+        .setTitle(getString(R.string.permission_denied_title))
         .setMessage(
-            "In order for the app to track your distance and route, the app needs additional access to your location. " +
-                    "You can change this permission in the device settings."
+            getString(R.string.permission_denied_description)
         )
         .setCancelable(false)
         .setPositiveButton("Ok") { dialog, _ ->
